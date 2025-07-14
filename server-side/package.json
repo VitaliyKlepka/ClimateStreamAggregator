@@ -1,0 +1,38 @@
+{
+  "name": "climate-aggregator",
+  "version": "1.0.0",
+  "description": "Climate Event Stream Aggregation Service",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migrate": "typeorm-ts-node-commonjs migration:run -d ./src/infrastructure/db/database.ts",
+    "migrate:revert": "typeorm-ts-node-commonjs migration:revert -d ./src/infrastructure/db/database.ts",
+    "migrate:show": "typeorm-ts-node-commonjs migration:show -d ./src/infrastructure/db/database.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.4.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.24.3",
+    "inversify": "^7.5.4",
+    "ioredis": "^5.6.1",
+    "pg": "^8.11.3",
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3",
+    "reflect-metadata": "^0.2.2",
+    "ts-node": "^10.9.2",
+    "typeorm": "^0.3.17",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.9",
+    "@types/pg": "^8.10.7",
+    "@types/ws": "^8.5.8",
+    "tsx": "^4.1.2",
+    "typescript": "^5.2.2"
+  }
+}
