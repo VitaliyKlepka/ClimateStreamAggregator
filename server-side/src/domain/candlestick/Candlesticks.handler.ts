@@ -2,6 +2,8 @@ import { inject } from "inversify";
 import { TYPES } from "../../infrastructure/ioc/types";
 import { CandlestickService } from "../../application/Candlestick.service";
 import { injectable } from "inversify";
+import { WithGuard } from "../../infrastructure/httpServer";
+import { HttpAuthGuard } from "../auth/guards/http.guard";
 
 @injectable()
 export class CandlesticksHandler {
@@ -75,9 +77,9 @@ export class CandlesticksHandler {
 
   public exportMetadata(): Record<string, any>[] {
     return [
-      { method: 'GET', path: '/api/candlesticks', handler: this.getCandlesticks.bind(this) },
-      { method: 'GET', path: '/api/candlesticks/available-cities', handler: this.getAvailableCities.bind(this) },
-      { method: 'GET', path: '/api/candlesticks/date-range', handler: this.getCandlesticksByDateRange.bind(this) },
+      { method: 'GET', path: '/api/candlesticks', handler: WithGuard(HttpAuthGuard, this.getCandlesticks.bind(this)) },
+      { method: 'GET', path: '/api/candlesticks/available-cities', handler: WithGuard(HttpAuthGuard, this.getAvailableCities.bind(this)) },
+      { method: 'GET', path: '/api/candlesticks/date-range', handler: WithGuard(HttpAuthGuard, this.getCandlesticksByDateRange.bind(this)) },
     ];
   }
 }

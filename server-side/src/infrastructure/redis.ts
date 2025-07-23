@@ -33,6 +33,7 @@ export class RedisBuffer {
 
   // Store temperature reading in Redis buffer
   async storeTemperatureReading(reading: TemperatureData): Promise<void> {
+    // console.log("[DEBUG]::[STORING_TO_REDIS_BUFFER]::", reading);
     const key = `${this.TEMPERATURE_KEY_PREFIX}${reading.city}`;
     const data = {
       temperature: reading.temperature,
@@ -40,12 +41,16 @@ export class RedisBuffer {
       city: reading.city
     };
 
+    // console.log("[DEBUG]::[STORING_TO_REDIS_BUFFER]::[PAYLOAD]::", {key, data});
+
     // Store as sorted set with timestamp as score for easy range queries
-    await this.redis.zadd(
+    const res = await this.redis.zadd(
       key,
       reading.timestamp.getTime(),
       JSON.stringify(data)
     );
+
+    // console.log("[DEBUG]::[STORING_TO_REDIS_BUFFER]::[RESULT]::", res);
 
     // Set expiry on the key
     await this.redis.expire(key, this.BUFFER_EXPIRY);
@@ -66,12 +71,14 @@ export class RedisBuffer {
 
   // Get temperature data for a specific city
   async getTemperatureDataForCity(city: string): Promise<TemperatureData[]> {
+    // console.log("[DEBUG]::[GETTING_FROM_REDIS_BUFFER]::[FOR_CITY]::", city);
     const key = `${this.TEMPERATURE_KEY_PREFIX}${city}`;
     
     // Get all data from sorted set
     const rawData = await this.redis.zrange(key, 0, -1);
+    // console.log("[DEBUG]::[GETTING_FROM_REDIS_BUFFER]::[RAW_DATA]::", rawData);
     
-    return rawData.map((item: string) => {
+    const parsedData = rawData.map((item: string) => {
       const parsed = JSON.parse(item);
       return {
         city: parsed.city,
@@ -79,6 +86,8 @@ export class RedisBuffer {
         timestamp: new Date(parsed.timestamp)
       };
     });
+    // console.log("[DEBUG]::[GETTING_FROM_REDIS_BUFFER]::[PARSED_DATA]::", parsedData);
+    return parsedData;
   }
 
   // Get temperature data within a time range

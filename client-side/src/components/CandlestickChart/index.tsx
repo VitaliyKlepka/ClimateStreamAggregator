@@ -14,6 +14,8 @@ import { CandlestickController, CandlestickElement } from 'chartjs-chart-financi
 import { Candlestick, Timeframe } from '../../types';
 import { formatTemperature } from '../../utils';
 
+// alternative react-financial-charts
+// import { CandlestickChart as FinancialCandlestickChart } from 'react-financial-charts';
 // Register Chart.js components including candlestick
 ChartJS.register(
   CategoryScale,
@@ -54,7 +56,7 @@ export const CandlestickChart: FC<CandlestickChartProps> = ({
     return (
       <div className="chart-container">
         <div className="no-data">
-          <h3>📊 No Data Available</h3>
+          <h3>No Data Available</h3>
           <p>No {timeframe} candlestick data available for {city}</p>
           <p>Try selecting a different time range or city.</p>
         </div>
@@ -65,11 +67,13 @@ export const CandlestickChart: FC<CandlestickChartProps> = ({
   // Convert candlestick data to financial chart format
   const candlestickData = data.map(candle => ({
     x: candle.timestamp,
+    t: new Date(candle.timestamp),
     o: Number(candle.open),
     h: Number(candle.high),
     l: Number(candle.low),
     c: Number(candle.close),
   }));
+  console.log("[DEBUG]::[CANDLESTICK_DATA]::", candlestickData);
 
   // Get timeframe-specific formatting
   const getTimeFormat = (timeframe: Timeframe) => {
@@ -136,7 +140,7 @@ export const CandlestickChart: FC<CandlestickChartProps> = ({
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         titleColor: 'white',
-        bodyColor: 'white',
+        bodyColor: 'red',
         borderColor: '#26a69a',
         borderWidth: 1,
       },
@@ -209,8 +213,8 @@ export const CandlestickChart: FC<CandlestickChartProps> = ({
 
   // Calculate price change
   const firstCandle = data[0];
-  const priceChange = latestCandle && firstCandle ? latestCandle.close - firstCandle.open : 0;
-  const priceChangePercent = firstCandle ? (priceChange / firstCandle.open) * 100 : 0;
+  const change = latestCandle && firstCandle ? latestCandle.close - firstCandle.open : 0;
+  const changePercent = firstCandle ? (change / firstCandle.open) * 100 : 0;
 
   return (
     <div className="chart-container">
@@ -262,14 +266,14 @@ export const CandlestickChart: FC<CandlestickChartProps> = ({
             <h4>📈 Change</h4>
             <div className="stat">
               <span className="stat-label">Change:</span>
-              <span className={`stat-value ${priceChange >= 0 ? 'positive' : 'negative'}`}>
-                {priceChange >= 0 ? '+' : ''}{formatTemperature(priceChange)}
+              <span className={`stat-value ${change >= 0 ? 'positive' : 'negative'}`}>
+                {change >= 0 ? '+' : ''}{formatTemperature(change)}
               </span>
             </div>
             <div className="stat">
               <span className="stat-label">Change %:</span>
-              <span className={`stat-value ${priceChangePercent >= 0 ? 'positive' : 'negative'}`}>
-                {priceChangePercent >= 0 ? '+' : ''}{priceChangePercent.toFixed(2)}%
+              <span className={`stat-value ${changePercent >= 0 ? 'positive' : 'negative'}`}>
+                {changePercent >= 0 ? '+' : ''}{changePercent.toFixed(2)}%
               </span>
             </div>
             <div className="stat">

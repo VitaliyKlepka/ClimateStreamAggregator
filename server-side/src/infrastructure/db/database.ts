@@ -3,6 +3,8 @@ import { config } from '../../config';
 import { Candlestick15mEntity } from '../../domain/candlestick/entities/Candlestick15m.entity';
 import { Candlestick30mEntity } from '../../domain/candlestick/entities/Candlestick30m.entity';
 import { Candlestick1hEntity } from '../../domain/candlestick/entities/Candlestick1h.entity';
+import { UserEntity } from '../../domain/user/entities/User.entity';
+import { UserSessionEntity } from '../../domain/user/entities/UserSession.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -13,8 +15,7 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: config.nodeEnv === 'development', // Auto-create tables in dev
   logging: config.nodeEnv === 'development',
-  // entities: [],
-  entities: [Candlestick15mEntity, Candlestick30mEntity, Candlestick1hEntity],
+  entities: [UserEntity, UserSessionEntity, Candlestick15mEntity, Candlestick30mEntity, Candlestick1hEntity],
   migrations: ['src/infrastructure/db/migrations/*.ts'],
   subscribers: [],
   migrationsRun: false, // Don't auto-run migrations

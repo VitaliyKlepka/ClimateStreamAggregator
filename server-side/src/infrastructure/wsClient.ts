@@ -21,8 +21,30 @@ export class WSClient {
     this.ws.on('message', async (data: string = '') => {
       try {
         const event: ClimateEvent = JSON.parse(data);
+        // console.log("[DEBUG]::[WEATHER_EVENT]::", event);
+        // {
+        //   city: 'Berlin',
+        //   timestamp: '2025-07-21T14:15',
+        //   temperature: 20.4,
+        //   windspeed: 15.5,
+        //   winddirection: 306
+        // }
+        
         const { city, temperature, timestamp } = event;
-        await this.buffer.storeTemperatureReading({ city, temperature, timestamp: new Date(`${timestamp}`) });
+        // convert timestamp to UTC Date
+        const [date, time] = timestamp.split('T');
+        const [hours, minutes, _] = time.split(':');
+        const utcDate = new Date(
+          Date.UTC(
+            Number(date.split('-')[0]), 
+            Number(date.split('-')[1]) - 1, 
+            Number(date.split('-')[2]), 
+            Number(hours), 
+            Number(minutes),
+          )
+        );
+
+        await this.buffer.storeTemperatureReading({ city, temperature, timestamp: utcDate });
       } catch (err) {
         console.error('❌ WS message error:', err);
       }
@@ -36,5 +58,12 @@ export class WSClient {
     this.ws.on('error', (err) => {
       console.error('❌ WebSocket error:', err);
     });
+  }
+
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
   }
 }

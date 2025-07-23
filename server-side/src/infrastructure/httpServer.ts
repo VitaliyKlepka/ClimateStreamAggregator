@@ -1,9 +1,8 @@
+import { AuthHandler } from "../domain/auth/Auth.handler"
 import { CandlesticksHandler } from "../domain/candlestick/Candlesticks.handler"
 import { HealthCheckHandler } from "../domain/health/Healthcheck.handler"
 import { TYPES } from "./ioc/types"
 import { Container } from "inversify"
-
-// TODO: [Auth] - import { verifyAuth } from '../domain/auth/guard';
 
 interface IHttpTransport {
   listen: (params: Record<string, any>, cb?: (err: any, addr: any) => void) => void // Should be improved as other transports(Express.js etc.) has different signatures for the method
@@ -21,12 +20,9 @@ enum EServerStatus {
 export class HttpServer {
 
   private status: EServerStatus = EServerStatus.STOPPED;
-
-  private readonly params: Record<string, any>;
-
-  private readonly transport: IHttpTransport;
-
   private ioc: Container; // Inversion Of Controll container
+  private readonly params: Record<string, any>;
+  private readonly transport: IHttpTransport;
 
   constructor(
     params: Record<string, any>,
@@ -75,19 +71,21 @@ export class HttpServer {
 
   public applyHandlers() {
     const candlesticksHandler = this.ioc.get<CandlesticksHandler>(TYPES.CandlesticksHandler);
+    const authHandler = this.ioc.get<AuthHandler>(TYPES.AuthHandler);
 
     const handlersMetadata = [
       ...HealthCheckHandler.exportMetadata(),
       ...candlesticksHandler.exportMetadata(),
+      ...authHandler.exportMetadata(),
     ];
 
     handlersMetadata.forEach(hm => {
       console.log(`✅ Registered handler: ${hm.method} - ${hm.path}`);
       switch (hm.method) {
-        case 'GET': this.transport.get(hm.path, hm.handler); break;
-        case 'POST': this.transport.post(hm.path, hm.handler); break;
-        case 'PUT': this.transport.put(hm.path, hm.handler); break;
-        case 'DELETE': this.transport.delete(hm.path, hm.handler); break;
+        case 'GET': this.transport.get(hm.path, WithIoC(hm.handler, this.ioc)); break;
+        case 'POST': this.transport.post(hm.path, WithIoC(hm.handler, this.ioc)); break;
+        case 'PUT': this.transport.put(hm.path, WithIoC(hm.handler, this.ioc)); break;
+        case 'DELETE': this.transport.delete(hm.path, WithIoC(hm.handler, this.ioc)); break;
         default:
           console.error(`[ERROR]::Unknown HTTP method: ${hm.method}`);
           process.exit(1);
@@ -97,3 +95,14 @@ export class HttpServer {
 
 }
 
+const WithIoC = (handler: any, ioc: Container) => {
+  return (request: any, reply: any) => {
+    return handler(request, reply, ioc);
+  };
+};
+
+export const WithGuard = (guard: any, handler: any, ioc?: Container) => {
+  return (request: any, reply: any) => {
+    return guard(request, reply, handler, ioc);
+  };
+};

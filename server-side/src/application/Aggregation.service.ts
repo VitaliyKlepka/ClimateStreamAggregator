@@ -96,8 +96,10 @@ export class AggregationService {
       // Filter data for this specific time bucket
       const bucketData = allData.filter((item: TemperatureData) => {
         const timestamp = item.timestamp.getTime();
+        // console.log("[DEBUG]::[GETTING_FROM_REDIS_BUFFER]::[FOR_BUCKET]::[FILTERING]::", {city, bucketStart, bucketEnd, itemTimestamp: item.timestamp, timestampGetTime: timestamp});
         return timestamp >= bucketStart && timestamp < bucketEnd;
       });
+      // console.log("[DEBUG]::[GETTING_FROM_REDIS_BUFFER]::[FOR_BUCKET]::[FILTERED]::", bucketData);
 
       const temperatures = bucketData.map((item: TemperatureData) => item.temperature);
       

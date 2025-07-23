@@ -19,13 +19,13 @@ export const CitySelector: FC<CitySelectorProps> = ({
       </label>
       <select
         id="city-select"
+        className="city-select"
         value={selectedCity}
         onChange={(e) => onCityChange(e.target.value as City)}
-        className="city-select"
       >
         {
           CITIES.map((city: City) => (
-            <option key={city} value={city}>
+            <option key={city} value={city} className="city-option">
               {city}
             </option>
           ))

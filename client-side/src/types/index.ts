@@ -22,6 +22,11 @@ export interface CandlestickApiResponse {
   };
 }
 
+export interface LoginResponse {
+  accessToken: string;
+}
+  
+
 export interface CandlestickFilters {
   city: string;
   timeframe: '15m' | '30m' | '1h';

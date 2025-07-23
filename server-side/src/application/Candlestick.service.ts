@@ -87,12 +87,13 @@ export class CandlestickService {
       
       const queryBuilder = repository.createQueryBuilder('candlestick')
         .where('candlestick.city = :city', { city })
-        .andWhere('candlestick.timestamp >= :from', { from: fromTimestamp.toString() })
-        .andWhere('candlestick.timestamp <= :to', { to: toTimestamp.toString() })
+        // .andWhere('candlestick.timestamp >= :from', { from: Number(fromTimestamp) })
+        // .andWhere('candlestick.timestamp <= :to', { to: Number(toTimestamp) })
         .orderBy('candlestick.timestamp', 'ASC')
         .limit(limit);
 
       const results = await queryBuilder.getMany();
+      // console.log("[DEBUG]::[CANDLESTICKS_FOR_TIMEFRAME]::", { results, timeframe });
       
       return results.map(candle => ({
         id: candle.id,

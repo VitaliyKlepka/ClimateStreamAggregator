@@ -44,3 +44,7 @@ export const generateHourRange = (hoursBack: number = 24): { from: number; to: n
     to: formatToHour(now),
   };
 };
+
+export const decodeJWT = (token: string): any => {
+  return JSON.parse(atob(token.split('.')[1]));
+};

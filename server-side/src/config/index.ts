@@ -23,4 +23,5 @@ export const config = {
     host: '0.0.0.0',
   },
   nodeEnv: process.env.NODE_ENV || 'development',
+  jwtSecret: process.env.JWT_SECRET || 'secret',
 };

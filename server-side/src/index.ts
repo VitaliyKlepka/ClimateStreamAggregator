@@ -33,6 +33,8 @@ async function main() {
     await aggregationService.gracefulShutdown();
     await redisBuffer.disconnect();
     await httpServer.stop();
+    wsClient.disconnect();
+
     process.exit(0);
   });
 
